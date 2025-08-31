@@ -1,80 +1,67 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Red Carpet Royals - Powered by MAHAKAL</title>
+  <title>Red Carpet Royals - Powered by Mahakal</title>
   <style>
     body {
-      margin: 0;
-      font-family: 'Georgia', serif;
-      background: url('https://i.ibb.co/9rK9B5Q/red-carpet-bg.jpg') no-repeat center center fixed;
+      background: url('https://i.ibb.co/QkFJt3P/red-carpet-bg.jpg') no-repeat center center fixed;
       background-size: cover;
+      font-family: 'Georgia', serif;
       color: gold;
       text-align: center;
     }
-    header {
-      background: rgba(150, 0, 0, 0.9);
-      padding: 20px;
-      font-size: 32px;
-      font-weight: bold;
+    h1 {
+      background: red;
       color: gold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 15px;
-    }
-    header img {
-      width: 50px;
-    }
-    #inputSection {
-      margin: 20px auto;
-      background: rgba(150,0,0,0.9);
-      padding: 20px;
+      padding: 15px;
       border-radius: 12px;
-      width: 320px;
+      display: inline-block;
+      margin-top: 20px;
+      font-size: 32px;
     }
-    #inputSection input {
+    .number-box {
+      margin: 20px auto;
       padding: 10px;
-      width: 200px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
+      background: red;
+      border-radius: 10px;
+      display: inline-block;
     }
-    #inputSection button {
+    input {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
       padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
       background: gold;
       color: black;
-      border: none;
-      font-weight: bold;
-      border-radius: 8px;
       cursor: pointer;
+      margin-left: 10px;
     }
     #countdown {
-      margin-top: 10px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #fff;
+      font-size: 20px;
+      margin: 15px;
+      color: white;
     }
-    #cardsSection {
+    #cards-container {
       display: none;
       margin-top: 20px;
     }
-    #mobileDisplay {
-      font-size: 20px;
-      margin-bottom: 15px;
-      font-weight: bold;
-      color: #fff;
-    }
-    .cards {
+    .grid {
       display: grid;
-      grid-template-columns: repeat(4, 100px);
+      grid-template-columns: repeat(4, 150px);
       grid-gap: 15px;
       justify-content: center;
     }
     .card {
-      width: 100px;
-      height: 140px;
+      width: 150px;
+      height: 220px;
       perspective: 1000px;
       cursor: pointer;
     }
@@ -82,10 +69,10 @@
       position: relative;
       width: 100%;
       height: 100%;
-      transform-style: preserve-3d;
       transition: transform 0.8s;
+      transform-style: preserve-3d;
     }
-    .card.flip .card-inner {
+    .card.flipped .card-inner {
       transform: rotateY(180deg);
     }
     .card-front, .card-back {
@@ -93,7 +80,10 @@
       width: 100%;
       height: 100%;
       backface-visibility: hidden;
-      border-radius: 10px;
+      border-radius: 12px;
+    }
+    .card-front {
+      transform: rotateY(180deg);
     }
     .card-back {
       background: black;
@@ -101,121 +91,86 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 24px;
       font-weight: bold;
-      font-size: 18px;
-    }
-    .card-front {
-      transform: rotateY(180deg);
     }
   </style>
 </head>
 <body>
-  <audio id="flipSound" src="https://www.myinstants.com/media/sounds/card-flip.mp3"></audio>
-  <audio autoplay loop>
-    <source src="https://www.bensound.com/bensound-music/bensound-epic.mp3" type="audio/mpeg">
-  </audio>
-
-  <header>
-    <img src="https://cdn-icons-png.flaticon.com/512/616/616490.png" alt="crown">
-    Red Carpet Royals – Powered by MAHAKAL
-  </header>
-
-  <div id="inputSection">
+  <h1>Red Carpet Royals - Powered by MAHAKAL</h1>
+  <div class="number-box">
     <input type="text" id="mobileNumber" placeholder="Enter Mobile Number">
     <button onclick="startGame()">Start</button>
-    <div id="countdown"></div>
+  </div>
+  <div id="countdown"></div>
+  <div id="mobileDisplay"></div>
+  <div id="cards-container">
+    <div class="grid" id="cards"></div>
   </div>
 
-  <div id="cardsSection">
-    <div id="mobileDisplay"></div>
-    <div class="cards" id="cardsGrid"></div>
-  </div>
+<script>
+  let flippedCount = 0;
+  let lockedNumbers = {};
 
-  <script>
-    const cardsData = [
-      "https://i.ibb.co/7jsFcmb/jack-hearts.png",
-      "https://i.ibb.co/Mh1PvB1/jack-diamonds.png",
-      "https://i.ibb.co/RBQxZ5c/jack-clubs.png",
-      "https://i.ibb.co/7gnZfFh/jack-spades.png",
-      "https://i.ibb.co/Ld7Rjm5/queen-hearts.png",
-      "https://i.ibb.co/N2rTfvH/queen-diamonds.png",
-      "https://i.ibb.co/JrbHp0Q/queen-clubs.png",
-      "https://i.ibb.co/9c3XL3Q/queen-spades.png",
-      "https://i.ibb.co/sjqc6Xh/king-hearts.png",
-      "https://i.ibb.co/XCd3s5g/king-diamonds.png",
-      "https://i.ibb.co/vYcCN1w/king-clubs.png",
-      "https://i.ibb.co/6txks3Z/king-spades.png"
-    ];
-
-    let flippedCount = 0;
-    let lockedNumbers = JSON.parse(localStorage.getItem("lockedNumbers")) || {};
-
-    function startGame() {
-      const mobile = document.getElementById("mobileNumber").value;
-      if (!mobile) {
-        alert("Enter valid mobile number");
-        return;
-      }
-      if (lockedNumbers[mobile] && Date.now() < lockedNumbers[mobile]) {
-        alert("This number is locked. Try after 7 days!");
-        return;
-      }
-
-      const lockTime = Date.now() + 7 * 24 * 60 * 60 * 1000;
-      lockedNumbers[mobile] = lockTime;
-      localStorage.setItem("lockedNumbers", JSON.stringify(lockedNumbers));
-
-      startCountdown(lockTime);
-      document.getElementById("inputSection").style.display = "none";
-      document.getElementById("cardsSection").style.display = "block";
-      document.getElementById("mobileDisplay").innerText = "Mobile: " + mobile;
-      loadCards();
+  function startGame() {
+    let number = document.getElementById('mobileNumber').value;
+    if (!number) {
+      alert("Enter mobile number");
+      return;
     }
-
-    function startCountdown(endTime) {
-      const countdown = document.getElementById("countdown");
-      function update() {
-        const now = Date.now();
-        const diff = endTime - now;
-        if (diff <= 0) {
-          countdown.innerText = "Unlocked! You can play again.";
-          return;
-        }
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const mins = Math.floor((diff / (1000 * 60)) % 60);
-        const secs = Math.floor((diff / 1000) % 60);
-        countdown.innerText = `Lock: ${days}d ${hours}h ${mins}m ${secs}s`;
-        setTimeout(update, 1000);
-      }
-      update();
+    if (lockedNumbers[number]) {
+      alert("This number is locked. Try again later.");
+      return;
     }
+    lockedNumbers[number] = true;
+    document.getElementById('mobileDisplay').innerHTML = "<h2>Mobile: " + number + "</h2>";
+    document.getElementById('cards-container').style.display = "block";
+    startCountdown(7*24*60*60);
+    loadCards();
+  }
 
-    function loadCards() {
-      const grid = document.getElementById("cardsGrid");
-      grid.innerHTML = "";
-      const shuffled = cardsData.sort(() => 0.5 - Math.random());
-      shuffled.forEach(src => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <div class="card-inner">
-            <div class="card-back">MAHAKAL</div>
-            <div class="card-front"><img src="${src}" width="100%" height="100%"></div>
-          </div>
-        `;
-        card.addEventListener("click", () => flipCard(card));
-        grid.appendChild(card);
+  function startCountdown(seconds) {
+    const display = document.getElementById('countdown');
+    let timer = setInterval(function() {
+      let days = Math.floor(seconds / (24*60*60));
+      let hrs = Math.floor((seconds % (24*60*60)) / 3600);
+      let mins = Math.floor((seconds % 3600) / 60);
+      let secs = seconds % 60;
+      display.textContent = "Lockout Time: " + days + "d " + hrs + "h " + mins + "m " + secs + "s";
+      seconds--;
+      if (seconds < 0) clearInterval(timer);
+    }, 1000);
+  }
+
+  function loadCards() {
+    let suits = ["hearts","diamonds","clubs","spades"];
+    let ranks = ["jack","queen","king"];
+    let allCards = [];
+    suits.forEach(s => {
+      ranks.forEach(r => {
+        allCards.push(r + "_" + s + ".png");
       });
-    }
+    });
 
-    function flipCard(card) {
-      if (card.classList.contains("flip")) return;
-      if (flippedCount >= 2) return;
-      document.getElementById("flipSound").play();
-      card.classList.add("flip");
-      flippedCount++;
-    }
-  </script>
+    allCards = allCards.sort(() => Math.random() - 0.5);
+    const container = document.getElementById("cards");
+    container.innerHTML = "";
+    allCards.forEach(card => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <div class="card-inner">
+          <div class="card-back">MAHAKAL</div>
+          <div class="card-front"><img src="cards/${card}" width="150" height="220"></div>
+        </div>`;
+      div.addEventListener("click", function() {
+        if (flippedCount >= 2 || div.classList.contains("flipped")) return;
+        div.classList.add("flipped");
+        flippedCount++;
+      });
+      container.appendChild(div);
+    });
+  }
+</script>
 </body>
 </html>
